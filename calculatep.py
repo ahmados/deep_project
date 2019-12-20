@@ -6,7 +6,7 @@ from torch import optim
 from torch.utils import data
 import torch.nn as nn
 import torch.nn.functional as F
-from model import PixelCNN
+from modelmnist import PixelCNN
 from torchvision import *
 from tqdm import tqdm
 import numpy as np
@@ -14,18 +14,18 @@ import torchvision
 
 
 path = 'data'
-data_name = 'CIFAR'
-batch_size = 64
+data_name = 'MNIST'
+batch_size = 1
 
-layers = 10
+layers = 7
 kernel = 7
-channels = 128
+channels = 256
 epochs = 25
 
-save_path = 'models/model_23.pt'
-no_images = 64
-images_size = 32
-images_channels = 3
+save_path = 'models/model_9.pt'
+no_images = 1
+images_size = 28
+images_channels = 1
 
 normalize = transforms.Lambda(lambda image: np.array(image) / 255.0)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -47,99 +47,86 @@ net.eval()
 
 
 
-train = datasets.CIFAR10(root=path, train=True, download=True, transform = cifar_transform)
+train = datasets.MNIST(root=path, train=True, download=True, transform = transforms.ToTensor())
 train = data.DataLoader(train, batch_size=1, shuffle=True, num_workers =0, pin_memory = True)
 loglikes = []
 counter = 0
-for images, labels in tqdm(train, total=9):
+for images, labels in tqdm(train, total=4):
     loglike = 0
-    sample = torch.zeros(1, images_channels, images_size, images_size).to(device)
-    #Generating images pixel by pixel
-    for i in range(images_size):
+    sample = torch.zeros(no_images, images_channels, images_size, images_size).to(device)
+    # print('-------------------------------------SAMPLING!!!!!---------------------------------')
+    for i in (range(images_size)):
         for j in range(images_size):
-            for c in range(images_channels):
-                out = net(sample)
-                probs = torch.softmax(out[:, :, c, i, j], dim=1)[0].detach().cpu().numpy()
-                # print(probs)
-                loglike += np.log(np.max(probs))
-                # print(np.max(probs))
-                sample[:,c,i,j] = images[:, c, i, j]
-    print(loglike)
+            out = net(sample)
+            probs = F.softmax(out[:,:,i,j], dim=-1).data
+            loglike += np.log(np.max(probs.cpu().numpy()))
+            sample[:,:,i,j] = images[:, :, i, j]
+    # print(loglike)
     loglikes.append(loglike)
     counter += 1
-    if counter == 10:
+    if counter == 5:
         break
 print(np.mean(np.array(loglikes)))
-train = datasets.CIFAR10(root=path, train=False, download=True, transform = cifar_transform)
+
+train = datasets.MNIST(root=path, train=False, download=True, transform = transforms.ToTensor())
 train = data.DataLoader(train, batch_size=1, shuffle=True, num_workers =0, pin_memory = True)
 loglikes = []
 counter = 0
-for images, labels in tqdm(train, total=9):
+for images, labels in tqdm(train, total=4):
     loglike = 0
-    sample = torch.zeros(1, images_channels, images_size, images_size).to(device)
-    #Generating images pixel by pixel
-    for i in range(images_size):
+    sample = torch.zeros(no_images, images_channels, images_size, images_size).to(device)
+    # print('-------------------------------------SAMPLING!!!!!---------------------------------')
+    for i in (range(images_size)):
         for j in range(images_size):
-            for c in range(images_channels):
-                out = net(sample)
-                probs = torch.softmax(out[:, :, c, i, j], dim=1)[0].detach().cpu().numpy()
-                # print(probs)
-                loglike += np.log(np.max(probs))
-                # print(np.max(probs))
-                sample[:,c,i,j] = images[:, c, i, j]
-    print(loglike)
+            out = net(sample)
+            probs = F.softmax(out[:,:,i,j], dim=-1).data
+            loglike += np.log(np.max(probs.cpu().numpy()))
+            sample[:,:,i,j] = images[:, :, i, j]
+    # print(loglike)
     loglikes.append(loglike)
     counter += 1
-    if counter == 10:
+    if counter == 5:
         break
 print(np.mean(np.array(loglikes)))
 
-data_name = 'SVHN'
-train = datasets.SVHN(root=path, split='train', download=True, transform = cifar_transform)
+train = datasets.CIFAR10(root=path, train=True, download=True, transform = transforms.Compose([transforms.Resize((28, 28)),transforms.Grayscale(), transforms.ToTensor()]))
 train = data.DataLoader(train, batch_size=1, shuffle=True, num_workers =0, pin_memory = True)
-loglikesSVHN = []
+loglikes = []
 counter = 0
-for images, labels in tqdm(train, total=9):
+for images, labels in tqdm(train, total=4):
     loglike = 0
-    sample = torch.zeros(1, images_channels, images_size, images_size).to(device)
-    #Generating images pixel by pixel
+    sample = torch.zeros(no_images, images_channels, images_size, images_size).to(device)
+    # print('-------------------------------------SAMPLING!!!!!---------------------------------')
     for i in range(images_size):
         for j in range(images_size):
-            for c in range(images_channels):
-                out = net(sample)
-                probs = torch.softmax(out[:, :, c, i, j], dim=1)[0].detach().cpu().numpy()
-                # print(probs)
-                loglike += np.log(np.max(probs))
-                # print(np.max(probs))
-                sample[:,c,i,j] = images[:, c, i, j]
-    print(loglike)
-    loglikesSVHN.append(loglike)
+            out = net(sample)
+            probs = F.softmax(out[:,:,i,j], dim=-1).data
+            loglike += np.log(np.max(probs.cpu().numpy()))
+            sample[:,:,i,j] = images[:, :, i, j]
+    # print(loglike)
+    loglikes.append(loglike)
     counter += 1
-    if counter == 10:
+    if counter == 5:
         break
-print(np.mean(np.array(loglikesSVHN)))
+print(np.mean(np.array(loglikes)))
 
-data_name = 'SVHN'
-train = datasets.SVHN(root=path, split='test', download=True, transform = cifar_transform)
+train = datasets.CIFAR10(root=path, train=False, download=True, transform = transforms.Compose([transforms.Resize((28, 28)),transforms.Grayscale(), transforms.ToTensor()]))
 train = data.DataLoader(train, batch_size=1, shuffle=True, num_workers =0, pin_memory = True)
-loglikesSVHN = []
+loglikes = []
 counter = 0
-for images, labels in tqdm(train, total=9):
+for images, labels in tqdm(train, total=4):
     loglike = 0
-    sample = torch.zeros(1, images_channels, images_size, images_size).to(device)
-    #Generating images pixel by pixel
+    sample = torch.zeros(no_images, images_channels, images_size, images_size).to(device)
+    # print('-------------------------------------SAMPLING!!!!!---------------------------------')
     for i in range(images_size):
         for j in range(images_size):
-            for c in range(images_channels):
-                out = net(sample)
-                probs = torch.softmax(out[:, :, c, i, j], dim=1)[0].detach().cpu().numpy()
-                # print(probs)
-                loglike += np.log(np.max(probs))
-                # print(np.max(probs))
-                sample[:,c,i,j] = images[:, c, i, j]
-    print(loglike)
-    loglikesSVHN.append(loglike)
+            out = net(sample)
+            probs = F.softmax(out[:,:,i,j], dim=-1).data
+            loglike += np.log(np.max(probs.cpu().numpy()))
+            sample[:,:,i,j] = images[:, :, i, j]
+    # print(loglike)
+    loglikes.append(loglike)
     counter += 1
-    if counter == 10:
+    if counter == 5:
         break
-print(np.mean(np.array(loglikesSVHN)))
+print(np.mean(np.array(loglikes)))
