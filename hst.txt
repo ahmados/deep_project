@@ -1,0 +1,21 @@
+3.5786
+3.2335
+3.1499
+3.0988
+tensor(3.0470, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(3.0227, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.9778, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.9446, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.9118, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.9003, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.8749, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.8641, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.8425, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.8305, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.8301, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.8098, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.7995, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.7988, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.7811, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(2.7722, device='cuda:0', grad_fn=<DivBackward0>)
+tensor(3.5799, device='cuda:0', grad_fn=<DivBackward0>)
